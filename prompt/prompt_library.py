@@ -1,7 +1,7 @@
 # Prepare prompt template
 from langchain_core.prompts import ChatPromptTemplate
 
-prompt = ChatPromptTemplate.from_template("""
+document_analysis_promt = ChatPromptTemplate.from_template("""
 You are a highly capable assistant trained to analyze and summarize documents.
 Return ONLY valid JSON matching the exact schema below.
 
@@ -10,3 +10,13 @@ Return ONLY valid JSON matching the exact schema below.
 Analyze this document:
 {document_text}
 """)
+
+document_comparison_prompt = ChatPromptTemplate.from_template("""
+You are a highly capable assistant trained to compare documents.
+Return ONLY valid JSON matching the exact schema below.
+""")
+
+PROMPT_REGISTRY = {
+    "document_analysis": document_analysis_promt,
+    "document_comparison": document_comparison_prompt
+}
