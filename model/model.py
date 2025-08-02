@@ -22,7 +22,7 @@ class ChangeFormat(BaseModel):
     Page: str
     Changes: str
     
-class SummaryResponse(BaseModel[list[ChangeFormat]]):
+class SummaryResponse(RootModel[list[ChangeFormat]]):
     """
     Represents a response containing a list of changes in format.
     """
