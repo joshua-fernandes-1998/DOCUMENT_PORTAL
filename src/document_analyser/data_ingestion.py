@@ -1,18 +1,16 @@
 import os
-import fitz # works with PyMuPDF to import documents
-import uuid
+import fitz
 import sys
+import uuid
 from datetime import datetime
 from logger.custom_logger import CustomLogger
 from exception.custom_exception import DocumentPortalException
 
 class DocumentHandler:
     """
-    A utility class to handle document operations such as reading and extracting text.
-    Automatically logs operations and errors.
-    Uses PyMuPDF (fitz) for PDF handling.
+    Handles PDF saving and reading operations.
+    Automatically logs all actions and supports session-based organization.
     """
-
     def __init__(self,data_dir=None,session_id=None):
         try:
             self.log=CustomLogger().get_logger(__name__)
@@ -31,14 +29,15 @@ class DocumentHandler:
 
         except Exception as e:
             self.log.error(f"Error initializing DocumentHandler: {e}")
-            raise DocumentPortalException("Error initializing DocumentHandler", e) from e
+            raise DocumentPortalException("Error initializing DocumentHandler", sys)
+        
 
     def save_pdf(self,uploaded_file):
         try:
             filename = os.path.basename(uploaded_file.name)
             
             if not filename.lower().endswith(".pdf"):
-                raise DocumentPortalException("Invalid file type. Only PDFs are allowed.")
+                raise DocumentPortalException("Invalid file type. Only PDFs are allowed.",sys)
 
             save_path = os.path.join(self.session_path, filename)
             
@@ -57,7 +56,7 @@ class DocumentHandler:
         try:
             text_chunks = []
             with fitz.open(pdf_path) as doc:
-                for page_num, page in enumerate(doc, start=1):
+                for page_num, page in enumerate(doc, start=1): # type: ignore
                     text_chunks.append(f"\n--- Page {page_num} ---\n{page.get_text()}")
             text = "\n".join(text_chunks)
 
@@ -66,7 +65,7 @@ class DocumentHandler:
         except Exception as e:
             self.log.error(f"Error reading PDF: {e}")
             raise DocumentPortalException("Error reading PDF", e) from e
-        
+    
 if __name__ == "__main__":
     from pathlib import Path
     from io import BytesIO
