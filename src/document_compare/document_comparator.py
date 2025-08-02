@@ -22,5 +22,6 @@ class DocumentComparatorLLM:
     def _format_reponse(self):
         """
         Formats the response from the LLM into a dictionary.
+        It's a private method, hence "_" in front of the name.
         """
         pass
