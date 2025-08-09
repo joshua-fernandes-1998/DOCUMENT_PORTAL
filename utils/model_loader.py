@@ -2,15 +2,12 @@ import os
 import sys
 from dotenv import load_dotenv
 from utils.config_loader import load_config
-
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_groq import ChatGroq
 #from langchain_openai import ChatOpenAI
-
 from logger.custom_logger import CustomLogger
 from exception.custom_exception import DocumentPortalException
-
 log = CustomLogger().get_logger(__name__)
 
 class ModelLoader:
@@ -20,23 +17,25 @@ class ModelLoader:
     """
     
     def __init__(self):
+        
         load_dotenv()
         self._validate_env()
-        self.config = load_config()
+        self.config=load_config()
         log.info("Configuration loaded successfully", config_keys=list(self.config.keys()))
-    
+        
     def _validate_env(self):
         """
-        Validate necessary environment variables. Ensure API keys exist.
+        Validate necessary environment variables.
+        Ensure API keys exist.
         """
-        required_keys = ['GOOGLE_API_KEY', 'GROQ_API_KEY']
-        self.api_keys = {key: os.getenv(key) for key in required_keys}
+        required_vars=["GOOGLE_API_KEY","GROQ_API_KEY"]
+        self.api_keys={key:os.getenv(key) for key in required_vars}
         missing = [k for k, v in self.api_keys.items() if not v]
         if missing:
-            log.error(f"Missing environment variables", missing_vars=missing)
+            log.error("Missing environment variables", missing_vars=missing)
             raise DocumentPortalException("Missing environment variables", sys)
         log.info("Environment variables validated", available_keys=[k for k in self.api_keys if self.api_keys[k]])
-    
+        
     def load_embeddings(self):
         """
         Load and return the embedding model.
@@ -48,7 +47,7 @@ class ModelLoader:
         except Exception as e:
             log.error("Error loading embedding model", error=str(e))
             raise DocumentPortalException("Failed to load embedding model", sys)
-    
+        
     def load_llm(self):
         """
         Load and return the LLM model.
@@ -83,12 +82,12 @@ class ModelLoader:
         elif provider == "groq":
             llm=ChatGroq(
                 model=model_name,
-                api_key=self.api_keys["GROQ_API_KEY"],
+                api_key=self.api_keys["GROQ_API_KEY"], #type: ignore
                 temperature=temperature,
             )
             return llm
-        
-                # elif provider == "openai":
+            
+        # elif provider == "openai":
         #     return ChatOpenAI(
         #         model=model_name,
         #         api_key=self.api_keys["OPENAI_API_KEY"],
@@ -99,6 +98,8 @@ class ModelLoader:
             log.error("Unsupported LLM provider", provider=provider)
             raise ValueError(f"Unsupported LLM provider: {provider}")
         
+    
+    
 if __name__ == "__main__":
     loader = ModelLoader()
     
